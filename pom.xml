@@ -9,12 +9,13 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.valerycrane</groupId>
-    <artifactId>music_backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>music</name>
-    <description>music</description>
+    <artifactId>music-backend</artifactId>
+    <version>0.0.1</version>
+    <name>music-backend</name>
+    <description>music-backend</description>
+    <packaging>jar</packaging>
     <properties>
-        <java.version>22</java.version>
+        <java.version>21</java.version>
     </properties>
     <dependencies>
         <dependency>
