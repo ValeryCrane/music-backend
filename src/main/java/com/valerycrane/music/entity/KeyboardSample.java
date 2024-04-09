@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "keyboard_samples")
+@IdClass(KeyboardSampleId.class)
 public class KeyboardSample {
 
     @Column(name = "key_index")
@@ -13,6 +14,11 @@ public class KeyboardSample {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "sample_id")
     private Sample sample;
+
+    @Id
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinColumn(name = "keyboard_id")
+    private Keyboard keyboard;
 
     public KeyboardSample() {
     }
@@ -31,5 +37,13 @@ public class KeyboardSample {
 
     public void setSample(Sample sample) {
         this.sample = sample;
+    }
+
+    public Keyboard getKeyboard() {
+        return keyboard;
+    }
+
+    public void setKeyboard(Keyboard keyboard) {
+        this.keyboard = keyboard;
     }
 }
