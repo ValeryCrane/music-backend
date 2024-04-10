@@ -22,9 +22,6 @@ public class User {
     @Column(name = "hashed_password")
     private String hashedPassword;
 
-    @Column(name = "avatar_path")
-    private String avatarPath;
-
     @OneToMany(
             mappedBy = "creator",
             cascade = {CascadeType.ALL}
@@ -66,11 +63,10 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String hashedPassword, String avatarPath) {
+    public User(String username, String email, String hashedPassword) {
         this.username = username;
         this.email = email;
         this.hashedPassword = hashedPassword;
-        this.avatarPath = avatarPath;
     }
 
     public int getId() {
@@ -103,14 +99,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getAvatarPath() {
-        return avatarPath;
-    }
-
-    public void setAvatarPath(String avatarPath) {
-        this.avatarPath = avatarPath;
     }
 
     public List<Composition> getCompositions() {

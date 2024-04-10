@@ -14,9 +14,6 @@ public class Sample {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "path")
-    private String path;
-
     public Sample() {
     }
 
@@ -34,13 +31,5 @@ public class Sample {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 }

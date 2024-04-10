@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ApplicationHostServiceImpl implements ApplicationHostService {
+public final class ApplicationHostServiceImpl implements ApplicationHostService {
 
     @Value("${host}")
     private String host;

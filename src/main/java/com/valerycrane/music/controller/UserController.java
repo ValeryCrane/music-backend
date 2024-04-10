@@ -1,6 +1,7 @@
 package com.valerycrane.music.controller;
 
 import com.valerycrane.music.dto.*;
+import com.valerycrane.music.dto.user.*;
 import com.valerycrane.music.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @RestController
-public class UserController {
+public final class UserController {
 
     private final UserService userService;
 
@@ -23,9 +24,9 @@ public class UserController {
     public AuthTokenResponse register(@RequestBody UserRegisterRequest userRegisterRequest) {
         return new AuthTokenResponse(
                 userService.createUserAndProvideAuthTokenWithInfo(
-                        userRegisterRequest.username(),
-                        userRegisterRequest.email(),
-                        userRegisterRequest.password()
+                        userRegisterRequest.getUsername(),
+                        userRegisterRequest.getEmail(),
+                        userRegisterRequest.getPassword()
                 )
         );
     }
@@ -34,18 +35,22 @@ public class UserController {
     public AuthTokenResponse auth(@RequestBody UserAuthRequest userAuthRequest) {
         return new AuthTokenResponse(
                 userService.createAuthTokenForUserWithUsernameAndPassword(
-                        userAuthRequest.username(),
-                        userAuthRequest.password()
+                        userAuthRequest.getUsername(),
+                        userAuthRequest.getPassword()
                 )
         );
     }
 
     @GetMapping("/user")
-    public UserResponse getUser(
+    public Object getUser(
             @RequestHeader("Auth") String authToken,
-            @RequestParam("id") int id
+            @RequestParam(name = "id", required = false) Optional<Integer> id
     ) {
-        return userService.getUserInfoById(id, authToken);
+        if (id.isPresent()) {
+            return userService.getUserInfoById(id.get(), authToken);
+        } else {
+            return userService.getUserInfoByAuthToken(authToken);
+        }
     }
 
     @PostMapping(

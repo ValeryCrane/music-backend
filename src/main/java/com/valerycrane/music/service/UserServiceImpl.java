@@ -1,6 +1,9 @@
 package com.valerycrane.music.service;
 
 import com.valerycrane.music.dto.*;
+import com.valerycrane.music.dto.user.CurrentUserResponse;
+import com.valerycrane.music.dto.user.UserEditRequest;
+import com.valerycrane.music.dto.user.UserResponse;
 import com.valerycrane.music.entity.Composition;
 import com.valerycrane.music.entity.Token;
 import com.valerycrane.music.entity.User;
@@ -23,7 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements UserService {
+public final class UserServiceImpl implements UserService {
     @Value("${avatars-path}")
     private String avatarPath;
 
@@ -75,16 +78,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Integer id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new IllegalArgumentException("Invalid user id");
-        }
-    }
-
-    @Override
     public CurrentUserResponse getUserInfoByAuthToken(String authToken) {
         User user = getUserByAuthToken(authToken);
         return new CurrentUserResponse(
@@ -132,9 +125,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserInfo(UserEditRequest userEditRequest, String authToken) {
         User user = getUserByAuthToken(authToken);
-        user.setUsername(userEditRequest.username());
-        user.setEmail(userEditRequest.email());
-        user.setHashedPassword(hashPassword(userEditRequest.password()));
+        user.setUsername(userEditRequest.getUsername());
+        user.setEmail(userEditRequest.getEmail());
+        user.setHashedPassword(hashPassword(userEditRequest.getPassword()));
         userRepository.save(user);
     }
 
@@ -163,6 +156,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserByAuthToken(String authToken) {
         User user = getUserByAuthToken(authToken);
+        tokenRepository.deleteAllByUserId(user.getId());
         userRepository.delete(user);
     }
 
@@ -208,10 +202,6 @@ public class UserServiceImpl implements UserService {
             }
         }
         return false;
-    }
-
-    private Optional<User> getUserByAuthToken(Optional<String> authToken) {
-        return authToken.map(this::getUserByAuthToken);
     }
 
     private User getUserByAuthToken(String authToken) {

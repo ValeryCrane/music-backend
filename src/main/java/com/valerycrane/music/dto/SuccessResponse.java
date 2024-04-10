@@ -1,12 +1,11 @@
 package com.valerycrane.music.dto;
 
-public class SuccessResponse {
-    private final boolean success = true;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public final class SuccessResponse {
+    @JsonProperty("success")
+    final boolean success = true;
 
     public SuccessResponse() {
-    }
-
-    public boolean isSuccess() {
-        return success;
     }
 }
