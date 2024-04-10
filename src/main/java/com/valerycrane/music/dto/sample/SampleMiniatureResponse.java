@@ -1,38 +1,32 @@
-package com.valerycrane.music.entity;
+package com.valerycrane.music.dto.sample;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity
-@Table(name = "samples")
-public class Sample {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+public final class SampleMiniatureResponse {
     private int id;
-
-    @Column(name = "name")
     private String name;
 
-    public Sample() {
-    }
-
-    public Sample(String name) {
+    public SampleMiniatureResponse(int id, String name) {
+        this.id = id;
         this.name = name;
     }
 
+    @JsonProperty("id")
     public int getId() {
         return id;
     }
 
+    @JsonProperty("id")
     public void setId(int id) {
         this.id = id;
     }
 
+    @JsonProperty("name")
     public String getName() {
         return name;
     }
 
+    @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
     }
