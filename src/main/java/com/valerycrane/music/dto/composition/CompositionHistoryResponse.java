@@ -6,9 +6,9 @@ import java.util.List;
 
 public final class CompositionHistoryResponse {
     private int blueprintCount;
-    private List<BlueprintResponse> blueprints;
+    private List<BlueprintMiniatureResponse> blueprints;
 
-    public CompositionHistoryResponse(int blueprintCount, List<BlueprintResponse> blueprints) {
+    public CompositionHistoryResponse(int blueprintCount, List<BlueprintMiniatureResponse> blueprints) {
         this.blueprintCount = blueprintCount;
         this.blueprints = blueprints;
     }
@@ -24,12 +24,12 @@ public final class CompositionHistoryResponse {
     }
 
     @JsonProperty("blueprints")
-    public List<BlueprintResponse> getBlueprints() {
+    public List<BlueprintMiniatureResponse> getBlueprints() {
         return blueprints;
     }
 
     @JsonProperty("blueprints")
-    public void setBlueprints(List<BlueprintResponse> blueprints) {
+    public void setBlueprints(List<BlueprintMiniatureResponse> blueprints) {
         this.blueprints = blueprints;
     }
 }

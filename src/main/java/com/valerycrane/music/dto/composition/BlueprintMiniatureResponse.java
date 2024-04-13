@@ -1,17 +1,18 @@
 package com.valerycrane.music.dto.composition;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.valerycrane.music.dto.favourite.UserMiniatureResponse;
 
 public final class BlueprintMiniatureResponse {
     private int id;
     private Integer parentId;
-    private int creatorId;
+    private UserMiniatureResponse creator;
     private String value;
 
-    public BlueprintMiniatureResponse(int id, int creatorId, Integer parentId, String value) {
+    public BlueprintMiniatureResponse(int id, Integer parentId, UserMiniatureResponse creator, String value) {
         this.id = id;
-        this.creatorId = creatorId;
         this.parentId = parentId;
+        this.creator = creator;
         this.value = value;
     }
 
@@ -35,14 +36,14 @@ public final class BlueprintMiniatureResponse {
         this.parentId = parentId;
     }
 
-    @JsonProperty("creator_id")
-    public int getCreatorId() {
-        return creatorId;
+    @JsonProperty("creator")
+    public UserMiniatureResponse getCreator() {
+        return creator;
     }
 
-    @JsonProperty("creator_id")
-    public void setCreatorId(int creatorId) {
-        this.creatorId = creatorId;
+    @JsonProperty("creator")
+    public void setCreator(UserMiniatureResponse creator) {
+        this.creator = creator;
     }
 
     @JsonProperty("value")
