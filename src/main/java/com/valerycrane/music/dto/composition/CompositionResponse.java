@@ -12,7 +12,7 @@ public final class CompositionResponse {
     private String visibility;
     private UserMiniatureResponse creator;
     private List<UserMiniatureResponse> editors;
-    private BlueprintMiniatureResponse blueprint;
+    private BlueprintResponse blueprint;
 
     public CompositionResponse(
             int id,
@@ -21,7 +21,7 @@ public final class CompositionResponse {
             String visibility,
             UserMiniatureResponse creator,
             List<UserMiniatureResponse> editors,
-            BlueprintMiniatureResponse blueprint
+            BlueprintResponse blueprint
     ) {
         this.id = id;
         this.name = name;
@@ -93,12 +93,12 @@ public final class CompositionResponse {
     }
 
     @JsonProperty("blueprint")
-    public BlueprintMiniatureResponse getBlueprint() {
+    public BlueprintResponse getBlueprint() {
         return blueprint;
     }
 
     @JsonProperty("blueprint")
-    public void setBlueprint(BlueprintMiniatureResponse blueprint) {
+    public void setBlueprint(BlueprintResponse blueprint) {
         this.blueprint = blueprint;
     }
 }

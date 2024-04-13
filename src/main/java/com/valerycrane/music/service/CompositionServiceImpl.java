@@ -3,6 +3,7 @@ package com.valerycrane.music.service;
 import com.valerycrane.music.dto.CompositionMiniatureResponse;
 import com.valerycrane.music.dto.CompositionsResponse;
 import com.valerycrane.music.dto.composition.BlueprintMiniatureResponse;
+import com.valerycrane.music.dto.composition.BlueprintResponse;
 import com.valerycrane.music.dto.composition.CompositionHistoryResponse;
 import com.valerycrane.music.dto.composition.CompositionResponse;
 import com.valerycrane.music.entity.Blueprint;
@@ -155,8 +156,7 @@ public final class CompositionServiceImpl implements CompositionService {
                         blueprint.getParent() == null ? null : blueprint.getParent().getId(),
                         commonService.createUserMiniature(
                                 blueprint.getCreator(), commonService.isFavourite(blueprint.getCreator(), user)
-                        ),
-                        blueprint.getValue()
+                        )
                 )).toList()
         );
     }
@@ -186,7 +186,7 @@ public final class CompositionServiceImpl implements CompositionService {
                 editors.stream().map(
                         editor -> commonService.createUserMiniature(editor, commonService.isFavourite(editor, user))
                 ).toList(),
-                new BlueprintMiniatureResponse(
+                new BlueprintResponse(
                         blueprint.getId(),
                         blueprint.getParent() == null ? null : blueprint.getParent().getId(),
                         commonService.createUserMiniature(
