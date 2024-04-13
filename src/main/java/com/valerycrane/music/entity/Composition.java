@@ -2,6 +2,7 @@ package com.valerycrane.music.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,6 +37,14 @@ public class Composition {
     private List<User> editors;
 
     public Composition() {
+    }
+
+    public Composition(String name, User creator) {
+        this.name = name;
+        this.visibility = "private";
+        this.creator = creator;
+        this.blueprint = new Blueprint("{}", creator);
+        this.editors = new ArrayList<>();
     }
 
     public int getId() {

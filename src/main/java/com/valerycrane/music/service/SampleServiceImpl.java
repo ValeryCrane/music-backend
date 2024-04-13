@@ -3,11 +3,9 @@ package com.valerycrane.music.service;
 import com.valerycrane.music.dto.sample.SampleMiniatureResponse;
 import com.valerycrane.music.dto.sample.SamplesResponse;
 import com.valerycrane.music.entity.Sample;
-import com.valerycrane.music.entity.Token;
 import com.valerycrane.music.entity.User;
 import com.valerycrane.music.repository.SampleRepository;
 import com.valerycrane.music.repository.TokenRepository;
-import com.valerycrane.music.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public final class SampleServiceImpl implements SampleService {
@@ -25,17 +22,17 @@ public final class SampleServiceImpl implements SampleService {
     private String samplesPath;
 
     private final SampleRepository sampleRepository;
-    private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final CommonService commonService;
 
     public SampleServiceImpl(
             @Autowired SampleRepository sampleRepository,
-            @Autowired UserRepository userRepository,
-            @Autowired TokenRepository tokenRepository
+            @Autowired TokenRepository tokenRepository,
+            @Autowired CommonService commonService
     ) {
         this.sampleRepository = sampleRepository;
-        this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
+        this.commonService = commonService;
     }
 
     @Override
@@ -68,7 +65,7 @@ public final class SampleServiceImpl implements SampleService {
 
     @Override
     public SamplesResponse getUserSamples(String authToken) {
-        User user = getUserByAuthToken(authToken);
+        User user = commonService.getUserByAuthToken(authToken);
         List<Sample> samples = user.getSamples();
         return new SamplesResponse(
                 samples.size(),
@@ -77,14 +74,5 @@ public final class SampleServiceImpl implements SampleService {
                         sample.getName()
                 )).toList()
         );
-    }
-
-    private User getUserByAuthToken(String authToken) {
-        Optional<Token> token = tokenRepository.findFirstByValue(authToken);
-        if (token.isPresent()) {
-            return token.get().getUser();
-        } else {
-            throw new IllegalArgumentException("Invalid token");
-        }
     }
 }

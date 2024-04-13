@@ -33,6 +33,19 @@ public class Blueprint {
     public Blueprint() {
     }
 
+    public Blueprint(String value, User creator) {
+        this.value = value;
+        this.creator = creator;
+        this.timeCreated = new Date();
+    }
+
+    public Blueprint(String value, Blueprint parent, User creator) {
+        this.value = value;
+        this.parent = parent;
+        this.creator = creator;
+        this.timeCreated = new Date();
+    }
+
     public int getId() {
         return id;
     }

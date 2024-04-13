@@ -33,15 +33,18 @@ public final class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final ApplicationHostService applicationHostService;
+    private final CommonService commonService;
 
     public UserServiceImpl(
             @Autowired UserRepository userRepository,
             @Autowired TokenRepository tokenRepository,
-            @Autowired ApplicationHostService applicationHostService
+            @Autowired ApplicationHostService applicationHostService,
+            @Autowired CommonService commonService
     ) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.applicationHostService = applicationHostService;
+        this.commonService = commonService;
     }
 
     @Override
@@ -79,7 +82,7 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public CurrentUserResponse getUserInfoByAuthToken(String authToken) {
-        User user = getUserByAuthToken(authToken);
+        User user = commonService.getUserByAuthToken(authToken);
         return new CurrentUserResponse(
                 user.getId(),
                 user.getUsername(),
@@ -93,7 +96,7 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserInfoById(Integer id, String authToken) {
-        User currentUser = getUserByAuthToken(authToken);
+        User currentUser = commonService.getUserByAuthToken(authToken);
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             return new UserResponse(
@@ -112,7 +115,7 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserAvatar(byte[] avatar, String authToken) {
-        User user = getUserByAuthToken(authToken);
+        User user = commonService.getUserByAuthToken(authToken);
         try {
             Path path = Paths.get(avatarPath + "/" + user.getId() + ".jpg");
             Files.createDirectories(path.getParent());
@@ -124,7 +127,7 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserInfo(UserEditRequest userEditRequest, String authToken) {
-        User user = getUserByAuthToken(authToken);
+        User user = commonService.getUserByAuthToken(authToken);
         user.setUsername(userEditRequest.getUsername());
         user.setEmail(userEditRequest.getEmail());
         user.setHashedPassword(hashPassword(userEditRequest.getPassword()));
@@ -155,30 +158,20 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserByAuthToken(String authToken) {
-        User user = getUserByAuthToken(authToken);
+        User user = commonService.getUserByAuthToken(authToken);
         tokenRepository.deleteAllByUserId(user.getId());
         userRepository.delete(user);
     }
 
     @Override
     public CompositionsResponse getUserCompositionsByAuthToken(String authToken) {
-        User user = getUserByAuthToken(authToken);
-        List<Composition> compositions = user.getCompositions();
-        compositions.addAll(user.getEditedCompositions());
-        List<Composition> favouriteCompositions = user.getFavouriteCompositions();
-        return new CompositionsResponse(
-                compositions.size(),
-                compositions.stream().map(composition -> new CompositionMiniatureResponse(
-                        composition.getId(),
-                        composition.getName(),
-                        isCompositionFavourite(favouriteCompositions, composition)
-                )).toList()
-        );
+        User currentUser = commonService.getUserByAuthToken(authToken);
+        return getUserCompositionsById(currentUser.getId(), authToken);
     }
 
+    @Override
     public CompositionsResponse getUserCompositionsById(Integer id, String authToken) {
-        User currentUser = getUserByAuthToken(authToken);
-        List<Composition> favouriteCompositions = currentUser.getFavouriteCompositions();
+        User currentUser = commonService.getUserByAuthToken(authToken);
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             List<Composition> compositions = user.get().getCompositions();
@@ -187,29 +180,11 @@ public final class UserServiceImpl implements UserService {
                     compositions.stream().map(composition -> new CompositionMiniatureResponse(
                             composition.getId(),
                             composition.getName(),
-                            isCompositionFavourite(favouriteCompositions, composition)
+                            commonService.isFavourite(composition, currentUser)
                     )).toList()
             );
         } else {
             throw new IllegalArgumentException("Invalid user id");
-        }
-    }
-
-    private boolean isCompositionFavourite(List<Composition> favouriteCompositions, Composition composition) {
-        for (Composition favouriteComposition: favouriteCompositions) {
-            if (favouriteComposition.getId() == composition.getId()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private User getUserByAuthToken(String authToken) {
-        Optional<Token> token = tokenRepository.findFirstByValue(authToken);
-        if (token.isPresent()) {
-            return token.get().getUser();
-        } else {
-            throw new IllegalArgumentException("Invalid token");
         }
     }
 
