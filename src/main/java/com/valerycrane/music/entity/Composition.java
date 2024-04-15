@@ -47,6 +47,14 @@ public class Composition {
         this.editors = new ArrayList<>();
     }
 
+    public Composition(String name, User creator, Blueprint blueprint) {
+        this.name = name;
+        this.visibility = "private";
+        this.creator = creator;
+        this.blueprint = blueprint;
+        this.editors = new ArrayList<>();
+    }
+
     public int getId() {
         return id;
     }

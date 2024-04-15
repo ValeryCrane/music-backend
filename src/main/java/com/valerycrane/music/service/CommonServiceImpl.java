@@ -1,11 +1,13 @@
 package com.valerycrane.music.service;
 
+import com.valerycrane.music.dto.composition.BlueprintResponse;
+import com.valerycrane.music.dto.composition.CompositionResponse;
 import com.valerycrane.music.dto.favourite.UserMiniatureResponse;
+import com.valerycrane.music.entity.Blueprint;
 import com.valerycrane.music.entity.Composition;
 import com.valerycrane.music.entity.Token;
 import com.valerycrane.music.entity.User;
 import com.valerycrane.music.repository.TokenRepository;
-import com.valerycrane.music.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +18,13 @@ import java.util.Optional;
 public final class CommonServiceImpl implements CommonService {
 
     private final TokenRepository tokenRepository;
-    private final UserRepository userRepository;
     private final ApplicationHostService applicationHostService;
 
     public CommonServiceImpl(
             @Autowired TokenRepository tokenRepository,
-            @Autowired UserRepository userRepository,
             @Autowired ApplicationHostService applicationHostService
     ) {
         this.tokenRepository = tokenRepository;
-        this.userRepository = userRepository;
         this.applicationHostService = applicationHostService;
     }
 
@@ -37,6 +36,32 @@ public final class CommonServiceImpl implements CommonService {
         } else {
             throw new IllegalArgumentException("Invalid token");
         }
+    }
+
+    @Override
+    public CompositionResponse createCompositionResponse(Composition composition, User currentUser) {
+        User creator = composition.getCreator();
+        List<User> editors = composition.getEditors();
+        Blueprint blueprint = composition.getBlueprint();
+        return new CompositionResponse(
+                composition.getId(),
+                composition.getName(),
+                isFavourite(composition, currentUser),
+                composition.getVisibility(),
+                createUserMiniature(creator, isFavourite(creator, currentUser)),
+                editors.stream().map(
+                        editor -> createUserMiniature(editor, isFavourite(editor, currentUser))
+                ).toList(),
+                new BlueprintResponse(
+                        blueprint.getId(),
+                        blueprint.getParent() == null ? null : blueprint.getParent().getId(),
+                        createUserMiniature(
+                                blueprint.getCreator(),
+                                isFavourite(blueprint.getCreator(), currentUser)
+                        ),
+                        blueprint.getValue()
+                )
+        );
     }
 
     @Override
