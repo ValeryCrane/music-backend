@@ -23,6 +23,11 @@ public class Keyboard {
     public Keyboard() {
     }
 
+    public Keyboard(List<KeyboardSample> keyboardSamples, String name) {
+        this.keyboardSamples = keyboardSamples;
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }
