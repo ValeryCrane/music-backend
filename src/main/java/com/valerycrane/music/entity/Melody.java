@@ -24,6 +24,12 @@ public class Melody {
     public Melody() {
     }
 
+    public Melody(String name, String blueprint, Keyboard keyboard) {
+        this.name = name;
+        this.blueprint = blueprint;
+        this.keyboard = keyboard;
+    }
+
     public int getId() {
         return id;
     }
