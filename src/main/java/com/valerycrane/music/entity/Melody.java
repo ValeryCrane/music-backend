@@ -17,7 +17,7 @@ public class Melody {
     @Column(name = "blueprint")
     private String blueprint;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "keyboard_id")
     private Keyboard keyboard;
 

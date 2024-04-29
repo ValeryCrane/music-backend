@@ -1,6 +1,7 @@
 package com.valerycrane.music.service;
 
 import com.valerycrane.music.dto.*;
+import com.valerycrane.music.dto.user.AuthTokenResponse;
 import com.valerycrane.music.dto.user.CurrentUserResponse;
 import com.valerycrane.music.dto.user.UserEditRequest;
 import com.valerycrane.music.dto.user.UserResponse;
@@ -48,7 +49,7 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String createAuthTokenForUserWithUsernameAndPassword(String username, String password) {
+    public AuthTokenResponse createAuthTokenForUserWithUsernameAndPassword(String username, String password) {
         Optional<User> user = userRepository.findByUsernameAndHashedPassword(
                 username,
                 hashPassword(password)
@@ -59,25 +60,31 @@ public final class UserServiceImpl implements UserService {
             token.setValue(UUID.randomUUID().toString());
             token.setUser(user.get());
             tokenRepository.save(token);
-            return token.getValue();
+            return new AuthTokenResponse(
+                    user.get().getId(),
+                    token.getValue()
+            );
         } else {
             throw new IllegalArgumentException("Invalid username or password");
         }
     }
 
     @Override
-    public String createUserAndProvideAuthTokenWithInfo(String username, String email, String password) {
+    public AuthTokenResponse createUserAndProvideAuthTokenWithInfo(String username, String email, String password) {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setHashedPassword(hashPassword(password));
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         Token token = new Token();
         token.setValue(UUID.randomUUID().toString());
-        token.setUser(user);
+        token.setUser(savedUser);
         tokenRepository.save(token);
-        return token.getValue();
+        return new AuthTokenResponse(
+                savedUser.getId(),
+                token.getValue()
+        );
     }
 
     @Override
@@ -128,9 +135,15 @@ public final class UserServiceImpl implements UserService {
     @Override
     public void updateUserInfo(UserEditRequest userEditRequest, String authToken) {
         User user = commonService.getUserByAuthToken(authToken);
-        user.setUsername(userEditRequest.getUsername());
-        user.setEmail(userEditRequest.getEmail());
-        user.setHashedPassword(hashPassword(userEditRequest.getPassword()));
+        if (userEditRequest.getUsername().isPresent()) {
+            user.setUsername(userEditRequest.getUsername().get());
+        }
+        if (userEditRequest.getEmail().isPresent()) {
+            user.setEmail(userEditRequest.getEmail().get());
+        }
+        if (userEditRequest.getPassword().isPresent()) {
+            user.setHashedPassword(hashPassword(userEditRequest.getPassword().get()));
+        }
         userRepository.save(user);
     }
 

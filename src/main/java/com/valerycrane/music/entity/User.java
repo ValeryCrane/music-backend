@@ -28,6 +28,12 @@ public class User {
     )
     private List<Composition> compositions;
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}
+    )
+    private List<Message> messages;
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinTable(
             name = "favourite_users",
@@ -107,6 +113,14 @@ public class User {
 
     public void setCompositions(List<Composition> compositions) {
         this.compositions = compositions;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 
     public List<User> getFavouriteUsers() {

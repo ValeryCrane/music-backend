@@ -1,0 +1,2 @@
+Grand Piano
+{"is_pedal_active":true,"effects":{"volume":{"volume_value":0.3}},"measures":1,"notes":[{"key_number":4,"start":0.25,"end":0.5},{"key_number":1,"start":0.75,"end":1},{"key_number":6,"start":1.5,"end":1.75},{"key_number":7,"start":2,"end":2.25},{"key_number":8,"start":2.25,"end":2.5},{"key_number":4,"start":2.75,"end":3},{"key_number":10,"start":3.25,"end":3.5}]}

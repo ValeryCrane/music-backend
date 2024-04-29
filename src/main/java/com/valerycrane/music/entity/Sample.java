@@ -14,10 +14,17 @@ public class Sample {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "beats")
+    private Integer beats;
+
     public Sample() {
     }
 
     public Sample(String name) {
+        this.name = name;
+    }
+
+    public Sample(String name, Integer beats) {
         this.name = name;
     }
 
@@ -35,5 +42,13 @@ public class Sample {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getBeats() {
+        return beats;
+    }
+
+    public void setBeats(Integer beats) {
+        this.beats = beats;
     }
 }

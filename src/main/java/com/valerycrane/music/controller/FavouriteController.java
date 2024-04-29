@@ -2,6 +2,7 @@ package com.valerycrane.music.controller;
 
 import com.valerycrane.music.dto.CompositionsResponse;
 import com.valerycrane.music.dto.SuccessResponse;
+import com.valerycrane.music.dto.favourite.FavouriteRequest;
 import com.valerycrane.music.dto.favourite.UsersResponse;
 import com.valerycrane.music.service.FavouriteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,18 +25,18 @@ public final class FavouriteController {
     @PostMapping("/favourite/user")
     public SuccessResponse addUserToFavourite(
             @RequestHeader("Auth") String authToken,
-            @RequestParam("id") int id
+            @RequestBody FavouriteRequest favouriteRequest
     ) {
-        favouriteService.setUserIsFavourite(authToken, id, true);
+        favouriteService.setUserIsFavourite(authToken, favouriteRequest.getId(), true);
         return new SuccessResponse();
     }
 
     @DeleteMapping("/favourite/user")
     public SuccessResponse removeUserFromFavourite(
             @RequestHeader("Auth") String authToken,
-            @RequestParam("id") int id
+            @RequestBody FavouriteRequest favouriteRequest
     ) {
-        favouriteService.setUserIsFavourite(authToken, id, false);
+        favouriteService.setUserIsFavourite(authToken, favouriteRequest.getId(), false);
         return new SuccessResponse();
     }
 
@@ -47,18 +48,18 @@ public final class FavouriteController {
     @PostMapping("/favourite/composition")
     public SuccessResponse addCompositionToFavourite(
             @RequestHeader("Auth") String authToken,
-            @RequestParam("id") int id
+            @RequestBody FavouriteRequest favouriteRequest
     ) {
-        favouriteService.setCompositionIsFavourite(authToken, id, true);
+        favouriteService.setCompositionIsFavourite(authToken, favouriteRequest.getId(), true);
         return new SuccessResponse();
     }
 
     @DeleteMapping("/favourite/composition")
     public SuccessResponse removeCompositionFromFavourite(
             @RequestHeader("Auth") String authToken,
-            @RequestParam("id") int id
+            @RequestBody FavouriteRequest favouriteRequest
     ) {
-        favouriteService.setCompositionIsFavourite(authToken, id, false);
+        favouriteService.setCompositionIsFavourite(authToken, favouriteRequest.getId(), false);
         return new SuccessResponse();
     }
 }

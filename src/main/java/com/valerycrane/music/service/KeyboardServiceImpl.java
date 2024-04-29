@@ -7,27 +7,33 @@ import com.valerycrane.music.entity.Keyboard;
 import com.valerycrane.music.entity.KeyboardSample;
 import com.valerycrane.music.entity.Sample;
 import com.valerycrane.music.repository.KeyboardRepository;
+import com.valerycrane.music.repository.KeyboardSampleRepository;
 import com.valerycrane.music.repository.SampleRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.io.*;
+import java.util.*;
 
 @Service
 public final class KeyboardServiceImpl implements KeyboardService {
 
     private final KeyboardRepository keyboardRepository;
+    private final KeyboardSampleRepository keyboardSampleRepository;
     private final SampleRepository sampleRepository;
+    private final SampleService sampleService;
 
     public KeyboardServiceImpl(
             @Autowired KeyboardRepository keyboardRepository,
-            @Autowired SampleRepository sampleRepository
+            @Autowired KeyboardSampleRepository keyboardSampleRepository,
+            @Autowired SampleRepository sampleRepository,
+            @Autowired SampleService sampleService
     ) {
         this.keyboardRepository = keyboardRepository;
+        this.keyboardSampleRepository = keyboardSampleRepository;
         this.sampleRepository = sampleRepository;
+        this.sampleService = sampleService;
     }
 
     @Override
@@ -37,7 +43,8 @@ public final class KeyboardServiceImpl implements KeyboardService {
                 keyboards.size(),
                 keyboards.stream().map(keyboard -> new KeyboardMiniatureResponse(
                         keyboard.getId(),
-                        keyboard.getName()
+                        keyboard.getName(),
+                        keyboard.getKeyboardSamples().size()
                 )).toList()
         );
     }
@@ -58,19 +65,88 @@ public final class KeyboardServiceImpl implements KeyboardService {
 
     @Override
     public int createKeyboard(String name, List<Integer> keySampleIds) {
-        List<KeyboardSample> keyboardSamples = new ArrayList<>();
+        Keyboard keyboard = new Keyboard(name);
+        Keyboard savedKeyboard = keyboardRepository.save(keyboard);
+
         for (int i = 0; i < keySampleIds.size(); i++) {
             Optional<Sample> sample = sampleRepository.findById(keySampleIds.get(i));
             if (sample.isEmpty()) {
                 throw new RuntimeException("Could not find sample with id " + keySampleIds.get(i));
             }
 
-            keyboardSamples.add(new KeyboardSample(i, sample.get()));
+            KeyboardSample keyboardSample = new KeyboardSample(i, sample.get(), savedKeyboard);
+            savedKeyboard.getKeyboardSamples().add(keyboardSample);
         }
 
-        Keyboard keyboard = new Keyboard(keyboardSamples, name);
-        Keyboard savedKeyboard = keyboardRepository.save(keyboard);
-        return savedKeyboard.getId();
+        return keyboardRepository.save(savedKeyboard).getId();
+    }
+
+    @PostConstruct
+    public void preloadKeyboards() throws IOException {
+        System.out.println("Preloading keyboards...");
+        File indexFile = new File("./index.txt");
+        Set<String> indexedDirectories = new HashSet<>();
+        if (indexFile.exists()) {
+            Scanner scanner = new Scanner(indexFile);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                indexedDirectories.add(line);
+            }
+            scanner.close();
+        } else {
+            indexFile.createNewFile();
+        }
+
+        InputStream resourceStream = this.getClass().getClassLoader().getResourceAsStream("static/keyboards");
+        BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(resourceStream)));
+        String resource;
+
+        while ((resource = br.readLine()) != null) {
+            if (!indexedDirectories.contains(resource)) {
+                indexedDirectories.add(resource);
+                loadKeyboardWithName(resource);
+            }
+        }
+        br.close();
+
+        FileWriter writer = new FileWriter(indexFile);
+        for (String indexedDirectory : indexedDirectories) {
+            writer.write(indexedDirectory);
+            writer.write('\n');
+        }
+        writer.close();
+    }
+
+    private void loadKeyboardWithName(String name) throws IOException {
+        InputStream inputStream = this.getClass()
+                .getClassLoader().getResourceAsStream("static/keyboards/" + name);
+        BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
+        Map<Integer, Integer> keyboardMap = new HashMap<>();
+        String resource;
+
+        while ((resource = br.readLine()) != null) {
+            String sampleName = resource.substring(0, resource.lastIndexOf('.'));
+            Integer sampleId = loadSampleForKeyboard(name, sampleName);
+            Integer sampleIndex = Integer.parseInt(sampleName) - 1;
+            keyboardMap.put(sampleIndex, sampleId);
+        }
+        br.close();
+
+        List<Integer> keySampleIds = Arrays.asList(new Integer[keyboardMap.size()]);
+        for (Integer keySampleIndex : keyboardMap.keySet()) {
+            keySampleIds.set(keySampleIndex, keyboardMap.get(keySampleIndex));
+        }
+
+        createKeyboard(name, keySampleIds);
+    }
+
+    private int loadSampleForKeyboard(String keyboardName, String sampleName) throws IOException {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        InputStream is = classloader.getResourceAsStream("static/keyboards/" + keyboardName + "/" + sampleName + ".wav");
+        byte[] sample = Objects.requireNonNull(is).readAllBytes();
+        is.close();
+
+        return sampleService.createSample(sampleName, null, sample);
     }
 
     private List<Integer> getKeyboardSampleIds(Keyboard keyboard) {

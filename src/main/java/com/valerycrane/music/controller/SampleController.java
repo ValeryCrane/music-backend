@@ -2,6 +2,7 @@ package com.valerycrane.music.controller;
 
 import com.valerycrane.music.dto.SuccessResponse;
 import com.valerycrane.music.dto.sample.SampleCreateResponse;
+import com.valerycrane.music.dto.sample.SampleMiniatureResponse;
 import com.valerycrane.music.dto.sample.SamplesResponse;
 import com.valerycrane.music.service.SampleService;
 import com.valerycrane.music.service.UserService;
@@ -21,9 +22,14 @@ public final class SampleController {
         this.sampleService = sampleService;
     }
 
-    @GetMapping(value = "/sample", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/sample", produces = "audio/wav")
     public byte[] sample(@RequestParam("id") int id) {
         return sampleService.getSampleById(id);
+    }
+
+    @GetMapping(value = "/sample/info")
+    public SampleMiniatureResponse sampleInfo(@RequestParam("id") int id) {
+        return sampleService.getSampleInfoById(id);
     }
 
     @PostMapping(
@@ -33,10 +39,11 @@ public final class SampleController {
     )
     public SampleCreateResponse createSample(
             @RequestParam("name") String name,
+            @RequestParam("beats") Integer beats,
             @RequestParam("file") MultipartFile file
     ) {
         try {
-            int sampleId = sampleService.createSample(name, file.getBytes());
+            int sampleId = sampleService.createSample(name, beats, file.getBytes());
             return new SampleCreateResponse(sampleId);
         } catch (IOException e) {
             throw new RuntimeException(e);

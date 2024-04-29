@@ -22,22 +22,18 @@ public final class UserController {
 
     @PostMapping("/user/register")
     public AuthTokenResponse register(@RequestBody UserRegisterRequest userRegisterRequest) {
-        return new AuthTokenResponse(
-                userService.createUserAndProvideAuthTokenWithInfo(
-                        userRegisterRequest.getUsername(),
-                        userRegisterRequest.getEmail(),
-                        userRegisterRequest.getPassword()
-                )
+        return userService.createUserAndProvideAuthTokenWithInfo(
+                userRegisterRequest.getUsername(),
+                userRegisterRequest.getEmail(),
+                userRegisterRequest.getPassword()
         );
     }
 
     @PostMapping("/user/auth")
     public AuthTokenResponse auth(@RequestBody UserAuthRequest userAuthRequest) {
-        return new AuthTokenResponse(
-                userService.createAuthTokenForUserWithUsernameAndPassword(
-                        userAuthRequest.getUsername(),
-                        userAuthRequest.getPassword()
-                )
+        return userService.createAuthTokenForUserWithUsernameAndPassword(
+                userAuthRequest.getUsername(),
+                userAuthRequest.getPassword()
         );
     }
 

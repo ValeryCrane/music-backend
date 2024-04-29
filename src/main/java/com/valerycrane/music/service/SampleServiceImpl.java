@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public final class SampleServiceImpl implements SampleService {
@@ -50,8 +51,22 @@ public final class SampleServiceImpl implements SampleService {
     }
 
     @Override
-    public int createSample(String name, byte[] data) {
-        Sample sample = new Sample(name);
+    public SampleMiniatureResponse getSampleInfoById(Integer id) {
+        Optional<Sample> optionalSample = sampleRepository.findById(id);
+        if (optionalSample.isPresent()) {
+            return new SampleMiniatureResponse(
+                    optionalSample.get().getId(),
+                    optionalSample.get().getName(),
+                    optionalSample.get().getBeats()
+            );
+        } else {
+            throw new RuntimeException("Sample not found: " + id);
+        }
+    }
+
+    @Override
+    public int createSample(String name, Integer beats, byte[] data) {
+        Sample sample = new Sample(name, beats);
         int savedSampleId = sampleRepository.save(sample).getId();
         try {
             Path path = Paths.get(samplesPath + "/" + savedSampleId + ".wav");
@@ -71,7 +86,8 @@ public final class SampleServiceImpl implements SampleService {
                 samples.size(),
                 samples.stream().map(sample -> new SampleMiniatureResponse(
                         sample.getId(),
-                        sample.getName()
+                        sample.getName(),
+                        sample.getBeats()
                 )).toList()
         );
     }

@@ -20,6 +20,12 @@ public class Composition {
     @Column(name = "visibility")
     private String visibility;
 
+    @OneToMany(
+            mappedBy = "composition",
+            cascade = {CascadeType.ALL}
+    )
+    private List<Message> messages;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "creator_id")
     private User creator;
@@ -43,7 +49,7 @@ public class Composition {
         this.name = name;
         this.visibility = "private";
         this.creator = creator;
-        this.blueprint = new Blueprint("{}", creator);
+        this.blueprint = new Blueprint("{\"bpm\":90,\"combinations\":[]}", creator);
         this.editors = new ArrayList<>();
     }
 
@@ -77,6 +83,14 @@ public class Composition {
 
     public void setVisibility(String visibility) {
         this.visibility = visibility;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 
     public User getCreator() {

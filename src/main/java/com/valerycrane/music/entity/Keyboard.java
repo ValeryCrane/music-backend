@@ -2,6 +2,7 @@ package com.valerycrane.music.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,9 +24,9 @@ public class Keyboard {
     public Keyboard() {
     }
 
-    public Keyboard(List<KeyboardSample> keyboardSamples, String name) {
-        this.keyboardSamples = keyboardSamples;
+    public Keyboard(String name) {
         this.name = name;
+        keyboardSamples = new ArrayList<>();
     }
 
     public int getId() {

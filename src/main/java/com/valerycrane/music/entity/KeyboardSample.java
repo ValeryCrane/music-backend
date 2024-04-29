@@ -23,9 +23,10 @@ public class KeyboardSample {
     public KeyboardSample() {
     }
 
-    public KeyboardSample(int keyIndex, Sample sample) {
+    public KeyboardSample(int keyIndex, Sample sample, Keyboard keyboard) {
         this.keyIndex = keyIndex;
         this.sample = sample;
+        this.keyboard = keyboard;
     }
 
     public int getKeyIndex() {
